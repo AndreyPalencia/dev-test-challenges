@@ -10,19 +10,26 @@ async function loadUser() {
     return;
   }
 
-  if (userId > 0 === false) {
+  if ((userId > 0 )=== false) {
     showResult('ID must be positive', true);
     return;
   }
 
-  if (!cachedUser) {
-    cachedUser = fetchUser(userId);
+  try {
+
+    if (!cachedUser) {
+      cachedUser = fetchUser(userId);
+    }
+
+    const user = await cachedUser;
+
+    document.getElementById('result').innerHTML =
+      `<strong>${user.name}</strong><br>${user.email}<br>${user.website}`;
+
+  } catch (error) {
+    cachedUser = null;
+    return showResult('Failed to load user', true);
   }
-
-  const user = await cachedUser;
-
-  document.getElementById('result').innerHTML =
-    `<strong>${user.name}</strong><br>${user.email}<br>${user.website}`;
 }
 
 function showResult(message, isError = false) {

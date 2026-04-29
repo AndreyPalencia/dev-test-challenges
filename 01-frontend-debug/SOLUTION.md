@@ -28,3 +28,22 @@ Replaced the assignment operator (`=`) with a strict equality operator (`===`) t
 - **Explanation:**  
 Using `=` inside a conditional statement assigns a value instead of comparing it, which leads to incorrect logic execution.  
 By using `===`, the code correctly checks whether `userId` is an empty string, ensuring proper validation before proceeding.
+
+
+### Bug 3: Improper async handling and missing error management
+
+- **File:** app.js  
+- **Lines:** 18–26  
+
+- **Cause:**  
+The promise returned by `fetchUser(userId)` was stored in `cachedUser`, but there was no proper error handling for rejected promises.  
+Additionally, the async flow was not safely controlled, which could lead to incorrect handling of unresolved or rejected promises.
+
+- **Fix:**  
+Wrapped the async logic in a `try/catch` block, ensured the promise stored in `cachedUser` is properly awaited, and reset `cachedUser` to `null` in case of failure to allow future retries.
+
+- **Explanation:**  
+Although caching a promise is a valid optimization, it must be handled carefully.  
+The promise must be properly awaited to obtain the resolved data, and any rejection must be handled to prevent application failure.  
+If a rejected promise remains cached, subsequent executions will continue to fail.  
+By using `try/catch`, awaiting the promise correctly, and resetting the cache on error, the application ensures a controlled and reliable async flow.
