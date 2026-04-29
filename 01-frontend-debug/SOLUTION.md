@@ -47,3 +47,22 @@ Although caching a promise is a valid optimization, it must be handled carefully
 The promise must be properly awaited to obtain the resolved data, and any rejection must be handled to prevent application failure.  
 If a rejected promise remains cached, subsequent executions will continue to fail.  
 By using `try/catch`, awaiting the promise correctly, and resetting the cache on error, the application ensures a controlled and reliable async flow.
+
+
+### Bug 4: Incorrect validation logic for userId
+
+- **File:** app.js  
+- **Line:** 13  
+
+- **Cause:**  
+The validation used a complex and unclear condition (`userId > 0 === false`), which relied on implicit type coercion and made the logic harder to understand.  
+Additionally, the input value was not explicitly converted to a number, which could lead to incorrect validation for non-numeric values.
+
+- **Fix:**  
+Converted the input value to a number using `Number(userId)` and replaced the condition with a clear validation using `isNaN(id) || id <= 0`.  
+Also updated the code to consistently use the validated numeric value (`id`) instead of the original `userId`, including in the API call (`fetchUser(id)`).
+
+- **Explanation:**  
+Using explicit type conversion ensures that the validation behaves predictably for all inputs.  
+The `isNaN(id)` check handles non-numeric values (e.g., "dd"), while `id <= 0` ensures the value is positive.  
+By consistently using `id` instead of `userId`, the application avoids relying on implicit type coercion and ensures that only validated numeric data is used throughout the execution flow.

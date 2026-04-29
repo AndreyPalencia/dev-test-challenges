@@ -10,7 +10,9 @@ async function loadUser() {
     return;
   }
 
-  if ((userId > 0 )=== false) {
+  const id = Number(userId);
+
+  if (isNaN(id) || id <= 0) {
     showResult('ID must be positive', true);
     return;
   }
@@ -18,7 +20,7 @@ async function loadUser() {
   try {
 
     if (!cachedUser) {
-      cachedUser = fetchUser(userId);
+      cachedUser = fetchUser(id);
     }
 
     const user = await cachedUser;
