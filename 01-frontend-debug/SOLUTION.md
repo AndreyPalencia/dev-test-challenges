@@ -67,6 +67,7 @@ Using explicit type conversion ensures that the validation behaves predictably f
 The `isNaN(id)` check handles non-numeric values (e.g., "dd"), while `id <= 0` ensures the value is positive.  
 By consistently using `id` instead of `userId`, the application avoids relying on implicit type coercion and ensures that only validated numeric data is used throughout the execution flow.
 
+
 ### Bug 5: XSS vulnerability in DOM rendering
 
 - **File:** app.js  
@@ -84,3 +85,23 @@ The content is now built as text nodes instead of HTML strings.
 Using `innerHTML` exposes the application to Cross-Site Scripting (XSS) attacks because it interprets input as HTML.  
 By switching to `textContent` and creating DOM elements manually, all user data is treated as plain text, preventing the execution of malicious scripts.  
 This ensures that even if the API returns unsafe data, it will not be executed in the browser.
+
+
+### Bug 6: Incorrect cache invalidation when userId changes
+
+- **File:** app.js  
+- **Lines:** 4, 22–25, 41–42  
+
+- **Cause:**  
+The application used a single cached promise (`cachedUser`) without properly checking whether the requested `userId` had changed.  
+This caused the application to reuse outdated data when a different `userId` was entered.
+
+- **Fix:**  
+Introduced a `lastIdUser` variable to track the last requested ID.  
+Updated the caching logic to only reuse `cachedUser` when the current `id` matches `lastIdUser`.  
+If the `id` changes, a new request is triggered and both `cachedUser` and `lastIdUser` are updated accordingly.
+
+- **Explanation:**  
+Caching improves performance, but it must be tied to the correct input key.  
+Without tracking `userId`, the application could display incorrect or stale data when switching between different IDs.  
+By introducing `lastIdUser`, the cache is now properly invalidated when the input changes, ensuring data consistency and correct user display.

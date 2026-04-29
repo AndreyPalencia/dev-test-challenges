@@ -1,6 +1,7 @@
 // app.js
 
 let cachedUser = null;
+let lastIdUser = null;
 
 async function loadUser() {
   const userId = document.getElementById('userId').value;
@@ -19,8 +20,9 @@ async function loadUser() {
 
   try {
 
-    if (!cachedUser) {
+    if (!cachedUser || lastIdUser !== id) {
       cachedUser = fetchUser(id);
+      lastIdUser = id;
     }
 
     const user = await cachedUser;
@@ -39,6 +41,7 @@ async function loadUser() {
 
   } catch (error) {
     cachedUser = null;
+    lastUserId = null;
     return showResult('Failed to load user', true);
   }
 }
