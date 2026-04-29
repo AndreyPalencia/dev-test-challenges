@@ -25,8 +25,17 @@ async function loadUser() {
 
     const user = await cachedUser;
 
-    document.getElementById('result').innerHTML =
-      `<strong>${user.name}</strong><br>${user.email}<br>${user.website}`;
+    const resultEl = document.getElementById('result');
+    resultEl.className = '';
+    resultEl.textContent = '';
+
+    const nameEl = document.createElement('strong');
+    nameEl.textContent = user.name;
+    resultEl.appendChild(nameEl);
+    resultEl.appendChild(document.createElement('br'));
+    resultEl.appendChild(document.createTextNode(user.email));
+    resultEl.appendChild(document.createElement('br'));
+    resultEl.appendChild(document.createTextNode(user.website));
 
   } catch (error) {
     cachedUser = null;

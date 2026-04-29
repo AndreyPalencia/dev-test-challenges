@@ -66,3 +66,21 @@ Also updated the code to consistently use the validated numeric value (`id`) ins
 Using explicit type conversion ensures that the validation behaves predictably for all inputs.  
 The `isNaN(id)` check handles non-numeric values (e.g., "dd"), while `id <= 0` ensures the value is positive.  
 By consistently using `id` instead of `userId`, the application avoids relying on implicit type coercion and ensures that only validated numeric data is used throughout the execution flow.
+
+### Bug 5: XSS vulnerability in DOM rendering
+
+- **File:** app.js  
+- **Lines:** 28-29 
+
+- **Cause:**  
+The application originally used `innerHTML` to render user data directly into the DOM.  
+This approach allows malicious content (e.g., injected scripts) to be interpreted and executed by the browser if the data is not trusted.
+
+- **Fix:**  
+Replaced the use of `innerHTML` with safe DOM manipulation using `textContent`, `createElement`, and `appendChild`.  
+The content is now built as text nodes instead of HTML strings.
+
+- **Explanation:**  
+Using `innerHTML` exposes the application to Cross-Site Scripting (XSS) attacks because it interprets input as HTML.  
+By switching to `textContent` and creating DOM elements manually, all user data is treated as plain text, preventing the execution of malicious scripts.  
+This ensures that even if the API returns unsafe data, it will not be executed in the browser.
