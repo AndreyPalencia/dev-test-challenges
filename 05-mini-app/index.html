@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini App - Information Username Github</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="container-main">
+      <div id="search-box">
+        <h1>API Explorer Dashboard GitHub</h1>
+        <div id="search">
+          <div><i class="fa-solid fa-magnifying-glass"></i></div>
+          <input id="search-input" type="text" placeholder="Username" />
+          <div><i class="fa-regular fa-circle-xmark"></i></div>
+        </div>
+      </div>
+      <div class="title-section">
+        <h1>Information user:</h1>
+        <p style="color: #999; ">Sin búsquedas previas</p>
+      </div>
+      <div class="history-box">
+        <div class="list-search-history"></div>
+      </div>
+      <div class="box-info-github">
+        <div class="avatar">
+          <div class="img-avatar">
+            <div class="img-avatar-img"></div>
+          </div>
+          <div class="avatar-info-main">
+            <span class="fullname">-----</span>
+            <span class="username">--</span>
+            <span class="info-value bio">-------------------------</span>
+          </div>
+        </div>
+        <div class="info-user">
+          <div class="info-user-box">
+            <div class="info-item">
+              <span class="info-label">ID:</span>
+              <span class="info-value info-id">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Tipo:</span>
+              <span class="info-value info-type">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Visto como:</span>
+              <span class="info-value info-view-type">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">GitHub URL:</span>
+              <span class="info-value"
+                ><a
+                  id="info-url"
+                  class="info-url"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >-</a
+                ></span
+              >
+            </div>
+          </div>
+          <div class="info-user-box">
+            <div class="info-item">
+              <span class="info-label">Creado:</span>
+              <span class="info-value info-created">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Modificado:</span>
+              <span class="info-value info-updated">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Seguidores:</span>
+              <span class="info-value info-followers">0</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Seguidos:</span>
+              <span class="info-value info-following">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
