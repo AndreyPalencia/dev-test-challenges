@@ -31,9 +31,23 @@ app.get('/data', async (req, res, next) => {
 app.post('/save', (req, res) => {
   const { name, value } = req.body;
 
+  
+  if (!name || !value) {
+    return res.status(400).json({
+      error: 'name and value are required',
+    });
+  }
+
   requestLog.push({ name, value, ts: Date.now() });
 
-  res.status(200).json({ saved: true, name, value });
+  if (requestLog.length > 5) {
+    requestLog.shift();
+  }
+
+
+  console.log(requestLog)
+  
+  return res.status(200).json({ saved: true, name, value });
 });
 
 

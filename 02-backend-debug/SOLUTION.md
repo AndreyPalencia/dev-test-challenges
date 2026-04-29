@@ -81,3 +81,33 @@ Error middleware
 - **Explanation:**
 Error middleware handles unexpected failures in a controlled way
 404 middleware handles unknown routes and improves API consistency
+
+
+### Bug 5: Missing input validation and memory control in POST /save
+
+- **File:** server.js
+- **Lines:** 29-34 (POST /save)
+
+- **Cause:**
+The original endpoint allowed requests without validation, meaning `name` and `value` could be undefined or empty. This could lead to invalid data being stored in the system.
+Additionally, requestLog was growing indefinitely, causing a memory leak in long-running server environments because no limit was applied to stored logs.
+
+- **Fix:**
+Added input validation for required fields (name, value)
+Added memory limit to prevent uncontrolled growth of requestLog
+`if (!name || !value) {
+  return res.status(400).json({
+    error: 'name and value are required',
+  });
+}`
+
+`requestLog.push({ name, value, ts: Date.now() });`
+
+`if (requestLog.length > 1000) {
+  requestLog.shift();
+}`
+
+- **Explanation:**
+
+Input validation ensures that the API only processes valid requests and returns a proper 400 Bad Request when required fields are missing.
+The memory control logic prevents requestLog from growing indefinitely, avoiding memory leaks in production environments. By limiting the array size, the server maintains stable memory usage over time.
