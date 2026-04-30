@@ -1,10 +1,8 @@
-
 const express = require('express');
 const app = express();
 app.use(express.json());
 
 const requestLog = [];
-
 
 async function getDataFromDB() {
   return new Promise((resolve) => {
@@ -12,25 +10,57 @@ async function getDataFromDB() {
   });
 }
 
-app.get('/data', async (req, res) => {
-  requestLog.push({ ts: Date.now() });   
+app.get('/data', async (req, res, next) => {
+  requestLog.push({ route: '/data', ts: Date.now() });
 
-  const data = getDataFromDB();          
+  try {
+    const data =  await getDataFromDB();
+    
+    if (!data) {
+      res.status(404).json({ error: 'No data found' });
+      return;
+    }
 
-  if (!data) {
-    res.status(200).json({ error: 'No data found' });  
-    return;
+    return res.status(200).json({ result: data });
+
+  } catch (err) {
+    next(err)
   }
-
-  res.json({ result: data.result });     
 });
 
 app.post('/save', (req, res) => {
   const { name, value } = req.body;
- 
-  requestLog.push({ name, value, ts: Date.now() });  
 
-  res.status(200).json({ saved: true, name, value });
+  
+  if (!name || !value) {
+    return res.status(400).json({
+      error: 'name and value are required',
+    });
+  }
+
+  requestLog.push({ name, value, ts: Date.now() });
+
+  if (requestLog.length > 5) {
+    requestLog.shift();
+  }
+
+
+  console.log(requestLog)
+  
+  return res.status(200).json({ saved: true, name, value });
+});
+
+
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    error: 'Internal Server Error',
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
 app.listen(3001, () => {

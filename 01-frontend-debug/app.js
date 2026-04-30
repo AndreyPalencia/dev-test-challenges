@@ -1,30 +1,49 @@
 // app.js
 
 let cachedUser = null;
+let lastIdUser = null;
 
 async function loadUser() {
   const userId = document.getElementById('userId').value;
 
- 
-  if (userId = '') {           
+  if (userId === '') {
     showResult('Please enter a valid ID');
     return;
   }
 
-  if (userId > 0 === false) {  
+  const id = Number(userId);
+
+  if (isNaN(id) || id <= 0) {
     showResult('ID must be positive', true);
     return;
   }
 
-  
-  if (!cachedUser) {
-    cachedUser = fetchUser(userId);  
-  }
+  try {
+
+    if (!cachedUser || lastIdUser !== id) {
+      cachedUser = fetchUser(id);
+      lastIdUser = id;
+    }
 
     const user = await cachedUser;
- 
-  document.getElementById('result').innerHTML =
-    `<strong>${user.name}</strong><br>${user.email}<br>${user.website}`;  
+
+    const resultEl = document.getElementById('result');
+    resultEl.className = '';
+    resultEl.textContent = '';
+
+    const nameEl = document.createElement('strong');
+    nameEl.textContent = user.name;
+    resultEl.appendChild(nameEl);
+    resultEl.appendChild(document.createElement('br'));
+    resultEl.appendChild(document.createTextNode(user.email));
+    resultEl.appendChild(document.createElement('br'));
+    resultEl.appendChild(document.createTextNode(user.website));
+
+  } catch (error) {
+    cachedUser = null;
+    lastUserId = null;
+    return showResult('Failed to load user', true);
+  }
 }
 
 function showResult(message, isError = false) {

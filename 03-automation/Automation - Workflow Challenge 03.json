@@ -1,0 +1,482 @@
+{
+  "name": "Automation - Workflow Challenge 03",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "register-user",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "de75dcdf-e57e-4411-9a1b-548ccfbd3d24",
+      "name": "Webhook",
+      "webhookId": "57c691f1-db72-4454-997b-37a53b56197c",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"saved\", \"message\": \"El usuario se creo con exito\"}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1600,
+        -160
+      ],
+      "id": "99635919-608b-4ae7-9a5f-cf2e69c7814f",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "P22veLbPV7QZd0zY",
+          "mode": "list",
+          "cachedResultName": "error_logs",
+          "cachedResultUrl": "/projects/y7fjHI3c0YA4maw3/datatables/P22veLbPV7QZd0zY"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $now }}",
+            "mensaje_error": "={{ $json.execution.error.message }}{{ $json.execution.error.stack }}",
+            "nodo_fallido": "={{ $json.execution.lastNodeExecuted }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mensaje_error",
+              "displayName": "mensaje_error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nodo_fallido",
+              "displayName": "nodo_fallido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "column": [
+            {
+              "name": "fecha",
+              "type": "date"
+            },
+            {
+              "name": "mensaje_error"
+            },
+            {
+              "name": "nodo_fallido"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        -400
+      ],
+      "id": "4b68886d-5bde-434b-b7b0-666058a3e5d7",
+      "name": "error_logs"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -416
+      ],
+      "id": "420016ae-2052-4f16-b310-1b901f61bade",
+      "name": "catch_error",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "=users",
+        "columns": {
+          "column": [
+            {
+              "name": "={{ $json.name || 'default_name' }}"
+            },
+            {
+              "name": "={{ $json.email || 'default_email' }}"
+            },
+            {
+              "name": "={{ $json.source || 'default_source' }}"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        -384
+      ],
+      "id": "5cc5b02c-632f-46ea-979c-da8971cf99cf",
+      "name": "users"
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = $input.first().json.body.email;\n\n  const isValid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);\n\n  return {\n    json: {\n      ...$input.first().json.body,\n      isValid\n    }\n  };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "f14faacb-66f8-441c-8d2b-209ea2937ba2",
+      "name": "Evaluación de correo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aec6f464-98dd-4b08-a578-d619f57fd26a",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        0
+      ],
+      "id": "32ca0d22-9998-49d7-ad21-9f2e189b59c3",
+      "name": "If Correo tiene formato correcto"
+    },
+    {
+      "parameters": {
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "4lVwTRESGRweralL",
+          "mode": "list",
+          "cachedResultName": "users",
+          "cachedResultUrl": "/projects/y7fjHI3c0YA4maw3/datatables/4lVwTRESGRweralL"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "default_email",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        -160
+      ],
+      "id": "3a0d210d-494f-4ff2-b6a4-5dbbccb50d49",
+      "name": "Existe el ya el correo",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cbb79113-6a8c-4442-9733-8c082b1d6949",
+              "leftValue": "={{ $json }}",
+              "rightValue": false,
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1136,
+        -96
+      ],
+      "id": "a94221a3-9bbd-4f29-a96b-009f37210792",
+      "name": "Si existe o no correo"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"duplicate\", \"message\": \"El usuario ya existe\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        -352
+      ],
+      "id": "82c4a7b6-7fe8-4de8-abbe-e804636866f6",
+      "name": "Respuesta que el correo ya esta resgistrado"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "4lVwTRESGRweralL",
+          "mode": "list",
+          "cachedResultName": "users",
+          "cachedResultUrl": "/projects/y7fjHI3c0YA4maw3/datatables/4lVwTRESGRweralL"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "default_name": "={{ $json.name }}",
+            "default_source": "={{ $json.source }}",
+            "default_email": "={{ $json.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "default_name",
+              "displayName": "default_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "default_email",
+              "displayName": "default_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "default_source",
+              "displayName": "default_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        -160
+      ],
+      "id": "d7c8fd8a-c940-4449-9d97-e609ab85b247",
+      "name": "Agregar el nuevo usuario",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"invalid\", \"message\": \"Formato de correo invalido\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1328,
+        256
+      ],
+      "id": "6afdb23d-1d29-4e65-b872-0adf1f601172",
+      "name": "Respuesta de formato invalido de correo"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Evaluación de correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "catch_error": {
+      "main": [
+        [
+          {
+            "node": "error_logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "users": {
+      "main": [
+        []
+      ]
+    },
+    "Evaluación de correo": {
+      "main": [
+        [
+          {
+            "node": "If Correo tiene formato correcto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Correo tiene formato correcto": {
+      "main": [
+        [
+          {
+            "node": "Existe el ya el correo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta de formato invalido de correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Existe el ya el correo": {
+      "main": [
+        [
+          {
+            "node": "Si existe o no correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Si existe o no correo": {
+      "main": [
+        [
+          {
+            "node": "Respuesta que el correo ya esta resgistrado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agregar el nuevo usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar el nuevo usuario": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3b34a456-76aa-4ab6-bfb9-b9c2b6ccf7e2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e7c77637d118d34e7d69dc5b4bcc1a4b14f522e924cd1d442a6d0a55f243e1ad"
+  },
+  "id": "chdgiHzWagfBexkO",
+  "tags": []
+}
